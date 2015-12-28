@@ -14,6 +14,7 @@ pip install youtube-dl
 ```
 
 Then, install [ffmpeg](https://www.ffmpeg.org/download.html).
+This bot requires [opus](https://www.opus-codec.org/downloads/) to work. If on windows put the opus .dll in to the same folder as the bot file.
 
 ## Usage
 Run PyVox by using the command line arguments
