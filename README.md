@@ -1,5 +1,6 @@
 # PyVox
-YouTube and Soundcloud playback bot for Discord. Supports some other websites as well
+YouTube and Soundcloud playback bot for Discord. Supports some other websites as well.  
+Feel free to contribute, this bot is poorly made by me and I appreciate any help I can get it.
 
 ## Installation
 

@@ -187,6 +187,8 @@ class MusicBot(discord.Client):
         if vtype == 'yq':
             info = ydl.extract_info(videourl, download=False, process=False)
             info = ydl.extract_info(info['entries'][0]['url'], download=False)
+            if 'list=' in info['webpage_url']:  # if playlist was found
+                vtype = 'yp'
         else:
             info = ydl.extract_info(videourl, download=False)
         if vtype == 'yp' or vtype == 'sp':
