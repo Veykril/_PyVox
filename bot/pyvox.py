@@ -186,6 +186,9 @@ class MusicBot(discord.Client):
         ydl = youtube_dl.YoutubeDL({'prefer_ffmpeg': True})
         if vtype == 'yq':
             info = ydl.extract_info(videourl, download=False, process=False)
+            if 'user' in info['entries'][0]['url']:
+                yield from self.send_message(self.bound_channel, "Found user, try something else")
+                return
             info = ydl.extract_info(info['entries'][0]['url'], download=False)
             if 'list=' in info['webpage_url']:  # if playlist was found
                 vtype = 'yp'
