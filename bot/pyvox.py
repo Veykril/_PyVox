@@ -35,7 +35,7 @@ class Video:
         elif self.view_count == -1:
             return "**{}** by **{}**[{}]".format(self.title, self.uploader, self.format_time())
         else:
-            return "**{}** by **{}**({} views)[{}]".format(self.title, self.uploader, self.view_count, self.format_time())
+            return "**{}** by **{}** ({} views) [{}]".format(self.title, self.uploader, self.view_count, self.format_time())
 
     def full_print(self):
         return "{} added by <@{}>".format(self.compact_print(), self.user.id)
@@ -111,13 +111,17 @@ class MusicBot(discord.Client):
             self.current = None
 
         elif message.content.startswith('{} version'.format(self.bot_mention)):  # version
-            yield from self.send_message(message.channel, "MusicBot mady by <@95587342839984128> running on version: {}".format("1.0"))
+            yield from self.send_message(message.channel, "Made by <@95587342839984128> running on PyVox version: {}".format("1.0"))
 
         if message.channel != self.bound_channel:  # ignore messages that aren't sent in the bound channel
             return
 
         elif message.content.startswith('{} yt'.format(self.bot_mention)):  # youtube queueing
-            yield from self.parse_vid_and_queue("https://www.youtube.com/watch?v={}".format(split[2]), "yt", message)
+            m = re.search('https?\:\/\/www\.youtube\.com\/watch\?v=.+', message.content)
+            if m == None:
+                yield from self.parse_vid_and_queue("https://www.youtube.com/watch?v={}".format(split[2]), "yt", message)
+            else:
+                yield from self.parse_vid_and_queue(m)
 
         elif message.content.startswith('{} sc'.format(self.bot_mention)):  # soundcloud queueing
             yield from self.parse_vid_and_queue("https://soundcloud.com/{}".format(split[2]), "sc", message)
@@ -180,9 +184,6 @@ class MusicBot(discord.Client):
     # ------------------------------------------------------------------------------------------------------------------
 
     def parse_vid_and_queue(self, videourl, vtype, message):
-        yield from self.get_info_and_queue(videourl, vtype, message)
-
-    def get_info_and_queue(self, videourl, vtype, message):
         ydl = youtube_dl.YoutubeDL({'prefer_ffmpeg': True})
         if vtype == 'yq':
             info = ydl.extract_info(videourl, download=False, process=False)
