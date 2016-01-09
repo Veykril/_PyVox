@@ -127,13 +127,13 @@ class MusicBot(discord.Client):
         elif message.content.startswith('{} sc'.format(self.bot_mention)):  # soundcloud queueing
             yield from self.parse_vid_and_queue("https://soundcloud.com/{}".format(split[2]), "sc", message)
 
-        elif message.content.startswith('{} vc'.format(self.bot_mention)):  # soundcloud queueing
+        elif message.content.startswith('{} vc'.format(self.bot_mention)):  # vocaroo queueing
             yield from self.parse_vid_and_queue("http://vocaroo.com/i/{}".format(split[2]), "vc", message)
 
-        elif message.content.startswith('{} yp'.format(self.bot_mention)):  # soundcloud queueing
+        elif message.content.startswith('{} yp'.format(self.bot_mention)):  # youtube queueing
             yield from self.parse_vid_and_queue("https://www.youtube.com/playlist?list={}".format(split[2]), "yp", message)
 
-        elif message.content.startswith('{} sp'.format(self.bot_mention)):  # soundcloud queueing
+        elif message.content.startswith('{} sp'.format(self.bot_mention)):  # soundcloud playlist
             yield from self.parse_vid_and_queue("https://soundcloud.com/{}".format(split[2]), "sp", message)
 
         elif message.content.startswith('{} yq'.format(self.bot_mention)):  # youtube query
@@ -174,7 +174,7 @@ class MusicBot(discord.Client):
             if message.author.id not in self.vote_next and message.author in self.voice.channel.voice_members:
                 self.vote_next.append(message.author.id)
                 yield from self.send_message(self.bound_channel, "{} voted to skip the current song.".format(message.author))
-            if len(self.vote_next) >= ((len(self.voice.channel.voice_members) - 1) / 2):
+            if len(self.vote_next) >= 2 or len(self.vote_next) >= ((len(self.voice.channel.voice_members) - 1) / 2):
                 self.player.stop()
                 yield from self.send_message(self.bound_channel, "Minimum number of votes achieved! Skipping song.")
 
@@ -183,11 +183,11 @@ class MusicBot(discord.Client):
 
         if message.content.startswith('{} pause'.format(self.bot_mention)):  # pause
             self.player.pause()
-            yield from self.send_message(self.bound_channel, "Song paused")
+            yield from self.send_message(self.bound_channel, "Current song paused.")
 
         if message.content.startswith('{} resume'.format(self.bot_mention)):  # resume
             self.player.resume()
-            yield from self.send_message(self.bound_channel, "Song resumed")
+            yield from self.send_message(self.bound_channel, "Current song resumed.")
 
     # ------------------------------------------------------------------------------------------------------------------
 
