@@ -1,6 +1,6 @@
 # PyVox
 YouTube and Soundcloud playback bot for Discord. Supports some other websites as well.  
-Feel free to contribute, this bot is poorly made by me and I appreciate any help I can get it.
+Feel free to contribute, I appreciate any help I can get.
 
 ## Installation
 
@@ -18,22 +18,23 @@ Then, install [ffmpeg](https://www.ffmpeg.org/download.html).
 This bot requires [opus](https://www.opus-codec.org/downloads/) to work. If on windows put the opus .dll in to the same folder as the bot file.
 
 ## Usage
-Run PyVox by using the command line arguments
+Run PyVox by using the command line arguments:
 
 ```
-python pyvox.py botemail botpassword
+python pyvox.py bot_email bot_password
 ```
-Commands are runned by mentioning the bot followed by the command
+Replace `bot_email` and `bot_password` with the bot's email and passwords respectively.
+
+Commands are run by mentioning the bot followed by the command:
 
 ```
 @Bot init
 ```
-
-Bot = the bot's name
+Bot = the bot's username
 
 ## Commands
 
-`init [voice channel name]`: Initiliazes the bot to the voice channel and makes him join the given channel. It also binds itself to the text channel this command got executed in.  
+`init [voice channel name]`: Initialises the bot to the voice channel and makes him join the given channel. It also binds itself to the text channel this command got executed in.  
 `destroy`: Destroys the voice connection and channel binding.  
 
 The following commands are meant for the bound channel:  
@@ -42,8 +43,9 @@ The following commands are meant for the bound channel:
 `yq [search-value]`: Queues the first video found by the given search term on youtube.  
 `sc [song "ID"]`: Queues the soundcloud audio with the given id.  
 `sp [set "ID"]`: Queues a soundcloud playlist.  
+`vc [link "ID"]`: Queues a vocaroo voice message.  
 `try [url]`: Tries to queue the audio of a video on the given website.  
 `list`: Lists the videos on the queue.  
 `link`: Sends the link of the currently playing video.  
-`next`: Skips the current song.  
+`next`: Vote to skip the current song.  
 `time`: Shows the current playback time.  
