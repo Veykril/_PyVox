@@ -56,6 +56,7 @@ class MusicBot(discord.Client):
         self.player = None
         self.play_next_song = asyncio.Event()
         self.play_queue = asyncio.Queue()
+        self.vote_next = []
 
     @asyncio.coroutine
     def on_ready(self):
@@ -126,13 +127,13 @@ class MusicBot(discord.Client):
         elif message.content.startswith('{} sc'.format(self.bot_mention)):  # soundcloud queueing
             yield from self.parse_vid_and_queue("https://soundcloud.com/{}".format(split[2]), "sc", message)
 
-        elif message.content.startswith('{} vc'.format(self.bot_mention)):  # soundcloud queueing
+        elif message.content.startswith('{} vc'.format(self.bot_mention)):  # vocaroo queueing
             yield from self.parse_vid_and_queue("http://vocaroo.com/i/{}".format(split[2]), "vc", message)
 
-        elif message.content.startswith('{} yp'.format(self.bot_mention)):  # soundcloud queueing
+        elif message.content.startswith('{} yp'.format(self.bot_mention)):  # youtube queueing
             yield from self.parse_vid_and_queue("https://www.youtube.com/playlist?list={}".format(split[2]), "yp", message)
 
-        elif message.content.startswith('{} sp'.format(self.bot_mention)):  # soundcloud queueing
+        elif message.content.startswith('{} sp'.format(self.bot_mention)):  # soundcloud playlist
             yield from self.parse_vid_and_queue("https://soundcloud.com/{}".format(split[2]), "sp", message)
 
         elif message.content.startswith('{} yq'.format(self.bot_mention)):  # youtube query
@@ -165,21 +166,28 @@ class MusicBot(discord.Client):
             if self.player is None or not self.player.is_playing():
                 return
             curr_time = int(time.time()-self.player._start)
-            yield from self.send_message(self.bound_channel, "{} / {} ({}%)".format(curr_time, self.current.duration, int(curr_time/self.current.duration*100)))
+            curr_time_pretty = time.strftime("%H:%M:%S", time.gmtime(curr_time))
+            total_time_pretty = time.strftime("%H:%M:%S", time.gmtime(self.current.duration))
+            yield from self.send_message(self.bound_channel, "**{}** / **{}** ({}%)".format(curr_time_pretty, total_time_pretty, int(curr_time/self.current.duration*100)))
 
         if message.content.startswith('{} n'.format(self.bot_mention)):  # next
-            self.player.stop()
+            if message.author.id not in self.vote_next and message.author in self.voice.channel.voice_members:
+                self.vote_next.append(message.author.id)
+                yield from self.send_message(self.bound_channel, "{} voted to skip the current song.".format(message.author))
+            if len(self.vote_next) >= 2 or len(self.vote_next) >= ((len(self.voice.channel.voice_members) - 1) / 2):
+                self.player.stop()
+                yield from self.send_message(self.bound_channel, "Minimum number of votes achieved! Skipping song.")
 
         if message.content.startswith('{} link'.format(self.bot_mention)):  # link
             yield from self.send_message(self.bound_channel, "Current song url: {}".format(self.current.url))
 
         if message.content.startswith('{} pause'.format(self.bot_mention)):  # pause
             self.player.pause()
-            yield from self.send_message(self.bound_channel, "Song paused")
+            yield from self.send_message(self.bound_channel, "Current song paused.")
 
         if message.content.startswith('{} resume'.format(self.bot_mention)):  # resume
             self.player.resume()
-            yield from self.send_message(self.bound_channel, "Song resumed")
+            yield from self.send_message(self.bound_channel, "Current song resumed.")
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -220,9 +228,10 @@ class MusicBot(discord.Client):
     def play(self):
         while True:
             if not self.is_voice_connected():
-                # yield from self.send_message(message.channel, 'Not connected to a voice channel')
+                yield from self.send_message(message.channel, 'Not connected to a voice channel')
                 print('not connected')
                 return
+            self.vote_next = []
             self.play_next_song.clear()
             self.current = yield from self.play_queue.get()
 
