@@ -77,7 +77,7 @@ class MusicBot(discord.Client):
         if message.author == self.user:  # don't listen to yourself
             return
         if message.channel.is_private:
-            yield from self.send_message(message.channel, "Don't use this bot via DM")
+            yield from self.send_message(message.channel, "Don't use this bot via DMs.")
 
         split = message.content.split()
 
@@ -112,7 +112,7 @@ class MusicBot(discord.Client):
             self.current = None
 
         elif message.content.startswith('{} version'.format(self.bot_mention)):  # version
-            yield from self.send_message(message.channel, "Made by <@95587342839984128> running on PyVox version: {}".format("1.0"))
+            yield from self.send_message(message.channel, "Made by <@95587342839984128> running on **PyVox** v{}".format("1.0"))
 
         if message.channel != self.bound_channel:  # ignore messages that aren't sent in the bound channel
             return
@@ -148,6 +148,13 @@ class MusicBot(discord.Client):
 
         elif message.content.startswith('{} try'.format(self.bot_mention)):  # queueing
             yield from self.parse_vid_and_queue(split[2], None, message)
+
+        elif message.content.startswith('{} purge'.format(self.bot_mention)):  # purging messages
+            if self.bound_channel is not None:
+                logs = yield from self.logs_from(self.bound_channel, 200)
+                for msg in logs:
+                    if msg.content.startswith('{}'.format(self.bot_mention)) or msg.author == self.user:
+                        yield from self.delete_message(msg)
 
         if self.current is None:  # commands after this need the current song reference
             return
